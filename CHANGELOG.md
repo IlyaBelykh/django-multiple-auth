@@ -1,6 +1,13 @@
 ChangeLog
 =========
 
+1.3 2024-08-27
+--------------
+
+- Added Django 5 compatibility
+- README fix
+- form_valid hook added on login view
+
 
 1.2 2017-12-18
 --------------

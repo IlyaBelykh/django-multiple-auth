@@ -1,7 +1,7 @@
 # Avoid shadowing the login() and logout() views below.
-from django.contrib.auth import REDIRECT_FIELD_NAME
+import logging
+from django.contrib.auth import REDIRECT_FIELD_NAME, login as wer
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.views import deprecate_current_app
 from django.contrib.sites.shortcuts import get_current_site
 from django.conf import settings
 from django.http import HttpResponseRedirect
@@ -15,6 +15,10 @@ from multiple_auth import (
     SESSION_KEY, LOGGED_USERS_KEY, USERS_PREFERENCES_KEY,
     store_user_preferences
 )
+
+def _form_valid(request, form, success_url):
+    auth_login(request, form.get_user())
+    return HttpResponseRedirect(success_url)
 
 @csrf_protect
 @never_cache
@@ -42,14 +46,14 @@ def switch(request, user_index, redirect_field_name=REDIRECT_FIELD_NAME):
     return HttpResponseRedirect(redirect_to)
 
 
-@deprecate_current_app
 @sensitive_post_parameters()
 @csrf_protect
 @never_cache
 def login(request, template_name='registration/login.html',
           redirect_field_name=REDIRECT_FIELD_NAME,
           authentication_form=AuthenticationForm,
-          extra_context=None, redirect_authenticated_user=False):
+          extra_context=None, redirect_authenticated_user=False,
+          form_valid=_form_valid):
     """
     Displays the login form and handles the login action.
     """
@@ -58,8 +62,7 @@ def login(request, template_name='registration/login.html',
         form = authentication_form(request, data=request.POST)
         if form.is_valid():
             store_user_preferences(request)
-            auth_login(request, form.get_user())
-            return HttpResponseRedirect(redirect_to)
+            return form_valid(request, form, redirect_to)
     else:
         form = authentication_form(request)
 
