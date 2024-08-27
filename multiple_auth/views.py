@@ -1,6 +1,5 @@
 # Avoid shadowing the login() and logout() views below.
-import logging
-from django.contrib.auth import REDIRECT_FIELD_NAME, login as wer
+from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.sites.shortcuts import get_current_site
 from django.conf import settings
