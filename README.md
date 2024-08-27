@@ -12,7 +12,7 @@ many users and quickly switch without having to type credentials.
 Requirements
 ------------
 
- - Django 1.10.* / Django 1.11.*
+ - Django compatible with 5.0.6
  - Tested under python 2.7 and 3.6
 
 
@@ -36,10 +36,10 @@ INSTALLED_APPS = (
 then update your project's `urls.py`:
 
 ```python
-urlpatterns = patterns(
+urlpatterns = [
     ...
-    url(r'^m_auth/', include('multiple_auth.urls')),
-)
+    re_path(r'^m_auth/', include('multiple_auth.urls')),
+]
 ```
 
 Usage
@@ -50,8 +50,8 @@ Replace the usage of `django.contrib.auth.views.login` by `multiple_auth.views.l
 ```python
 from multiple_auth.views import login
 
-urlpatterns = patterns(
-   url(r'^login/$', login, name='auth_login'),
+urlpatterns = [
+   re_path(r'^login/$', login, name='auth_login'),
 ]
 ```
 
@@ -68,17 +68,17 @@ In your template, load the template tag, show a list of logged-in users and give
     <ul>
         {% for u in logged_in_users %}
             <li>
-                {% if u != request.user %}
+                {% if u == request.user %}
                     <b>{{ u.username }}</b> - {{ u.get_full_name }}
                 {% else %}
-                    <a href="{% url "multiauth_switch" forloop.counter0 %}">
+                    <a href="{% url 'multiauth_switch' forloop.counter0 %}">
                         <b>{{ u.username }}</b> - {{ u.get_full_name }}
                     </a>
                 {% endif %}
             </li>
         {% endfor %}
     </ul>
-    <a href="{% url "multiauth_login" %}">Add account</a>
+    <a href="{% url 'multiauth_login' %}">Add account</a>
 {% endblock content %}
 ```
 
