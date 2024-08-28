@@ -82,4 +82,4 @@ In your template, load the template tag, show a list of logged-in users and give
 {% endblock content %}
 ```
 
-
+In order to log out of a specific user profile, use the `multiple_auth.views.logout` view.
