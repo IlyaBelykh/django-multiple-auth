@@ -1,5 +1,4 @@
 # Avoid shadowing the login() and logout() views below.
-import logging
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.sites.shortcuts import get_current_site
@@ -54,16 +53,14 @@ def logout(request, user_index, redirect_field_name=REDIRECT_FIELD_NAME):
     redirect_to = request.GET.get(redirect_field_name, settings.LOGIN_REDIRECT_URL)
     
     if len(request.session.get(LOGGED_USERS_KEY, [])) < (user_index + 1):
-        logging.critical("FIRST REDIRECT")
         return HttpResponseRedirect(redirect_to)
     
     if int(request.session.get(LOGGED_USERS_KEY)[user_index][SESSION_KEY]) == request.user.pk:
-        logging.critical("SECOND REDIRECT")
         return HttpResponseRedirect(redirect_to)
     
     request.session.get(LOGGED_USERS_KEY).pop(user_index)
     request.session.modified = True
-    
+
     return HttpResponseRedirect(redirect_to)
 
 
