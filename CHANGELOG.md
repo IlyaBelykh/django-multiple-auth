@@ -9,6 +9,7 @@ ChangeLog
 - form_valid hook added on login view
 - One user logout functionality added
 - Fixed account duplication on login
+- Logout current user view added
 
 
 1.2 2017-12-18

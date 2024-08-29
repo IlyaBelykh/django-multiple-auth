@@ -1,6 +1,8 @@
 # Avoid shadowing the login() and logout() views below.
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.signals import user_logged_out
+from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.shortcuts import get_current_site
 from django.conf import settings
 from django.http import HttpResponseRedirect
@@ -44,6 +46,24 @@ def switch(request, user_index, redirect_field_name=REDIRECT_FIELD_NAME):
 
     return HttpResponseRedirect(redirect_to)
 
+
+@csrf_protect
+@never_cache
+def logout_current(request, redirect_field_name=REDIRECT_FIELD_NAME):
+    redirect_to = request.GET.get(redirect_field_name, settings.LOGIN_REDIRECT_URL)
+    
+    for idx, u in request.session.get(LOGGED_USERS_KEY):
+        if request.user.pk == int(u[SESSION_KEY]):
+            break
+
+    user_logged_out.send(sender=request.user.__class__, request=request, user=request.user)
+
+    request.session.get(LOGGED_USERS_KEY).pop(idx)
+    request.session.modified = True
+
+    request.user = AnonymousUser()
+
+    return HttpResponseRedirect(redirect_to)
 
 @csrf_protect
 @never_cache
