@@ -58,7 +58,13 @@ def xlogin(request, user, backend=None):
         HASH_SESSION_KEY: session_auth_hash
     }
 
-    request.session.setdefault(LOGGED_USERS_KEY, []).append(logged_in_user)
+    logged_users = request.session.setdefault(LOGGED_USERS_KEY, [])
+    for u in logged_users:  # for/else used specifically to append user only if it doesn't exist in the list
+        if int(u[SESSION_KEY]) == user.pk:
+            break
+    else:
+        logged_users.append(logged_in_user)
+    
     request.session.update(logged_in_user)
     if hasattr(request, 'user'):
         request.user = user

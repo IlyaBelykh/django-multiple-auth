@@ -8,6 +8,7 @@ ChangeLog
 - README fix
 - form_valid hook added on login view
 - One user logout functionality added
+- Fixed account duplication on login
 
 
 1.2 2017-12-18
