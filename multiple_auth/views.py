@@ -52,7 +52,7 @@ def switch(request, user_index, redirect_field_name=REDIRECT_FIELD_NAME):
 def logout_current(request, redirect_field_name=REDIRECT_FIELD_NAME):
     redirect_to = request.GET.get(redirect_field_name, settings.LOGIN_REDIRECT_URL)
     
-    for idx, u in request.session.get(LOGGED_USERS_KEY):
+    for idx, u in enumerate(request.session.get(LOGGED_USERS_KEY)):
         if request.user.pk == int(u[SESSION_KEY]):
             break
 
