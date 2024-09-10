@@ -50,7 +50,10 @@ def switch(request, user_index, redirect_field_name=REDIRECT_FIELD_NAME):
 @csrf_protect
 @never_cache
 def logout_current(request, redirect_field_name=REDIRECT_FIELD_NAME):
-    redirect_to = request.GET.get(redirect_field_name, settings.LOGIN_REDIRECT_URL)
+    redirect_to = request.GET.get(redirect_field_name, settings.LOGOUT_REDIRECT_URL)
+
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(redirect_to)
     
     for idx, u in enumerate(request.session.get(LOGGED_USERS_KEY)):
         if request.user.pk == int(u[SESSION_KEY]):
@@ -59,7 +62,9 @@ def logout_current(request, redirect_field_name=REDIRECT_FIELD_NAME):
     user_logged_out.send(sender=request.user.__class__, request=request, user=request.user)
 
     request.session.get(LOGGED_USERS_KEY).pop(idx)
-    request.session.modified = True
+    logged_users = request.session.get(LOGGED_USERS_KEY)
+    request.session.flush()
+    request.session[LOGGED_USERS_KEY] = logged_users
 
     request.user = AnonymousUser()
 
@@ -70,7 +75,7 @@ def logout_current(request, redirect_field_name=REDIRECT_FIELD_NAME):
 def logout(request, user_index, redirect_field_name=REDIRECT_FIELD_NAME):
     """Logout from one specific user profile (except the one logged in currently)"""
     user_index = int(user_index)
-    redirect_to = request.GET.get(redirect_field_name, settings.LOGIN_REDIRECT_URL)
+    redirect_to = request.GET.get(redirect_field_name, settings.LOGOUT_REDIRECT_URL)
     
     if len(request.session.get(LOGGED_USERS_KEY, [])) < (user_index + 1):
         return HttpResponseRedirect(redirect_to)
